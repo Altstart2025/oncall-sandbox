@@ -1,0 +1,26 @@
+name: release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, e.g. 0.9.1"
+        required: true
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci && npm test
+      - name: Create the GitHub release (previous tags stay for rollback)
+        run: gh release create "v${{ inputs.version }}" --generate-notes --target "${{ github.sha }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Deploy (Render deploy hook)
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -n "$HOOK" ]; then curl -fsS -X POST "$HOOK"; else echo "RENDER_DEPLOY_HOOK not set; skipping deploy"; fi

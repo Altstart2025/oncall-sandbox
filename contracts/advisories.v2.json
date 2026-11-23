@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Advisory (feed v2)",
+  "type": "object",
+  "required": ["id", "region", "risk_level", "alt_band", "issued_at"],
+  "properties": {
+    "id": { "type": "string" },
+    "region": { "type": "string" },
+    "risk_level": { "enum": ["low", "elevated", "high"] },
+    "alt_band": { "type": "string", "description": "Altitude band, e.g. FL200-FL300 or SFC-FL100" },
+    "issued_at": { "type": "string", "format": "date-time" }
+  }
+}
